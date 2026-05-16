@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nusantara: Warisan Budaya 🇮🇩</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ==========================================
+           1. GLOBAL STYLES & VARIABLES
+           ========================================== */
+        :root {
+            --primary-color: #1E3A8A;
+            --primary-hover: #1D4ED8;
+            --accent-color: #3B82F6;
+            --text-main: #1F2937;
+            --text-muted: #4B5563;
+            --text-card: #475569;
+            --bg-app: #F8FAFC;
+            --bg-sidebar: #FFFFFF;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --info-color: #3B82F6;
+            --warning-color: #F59E0B;
+            --error-color: #EF4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-app);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* Typography */
+        .main-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 5px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 40px;
+            font-style: italic;
+        }
+
+        /* Utility Components (Streamlit Alert Counterparts) */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .alert-info { background-color: #EFF6FF; color: #1E40AF; border-left: 4px solid var(--info-color); }
+        .alert-success { background-color: #ECFDF5; color: #065F46; border-left: 4px solid var(--success-color); }
+        .alert-warning { background-color: #FFFBEB; color: #92400E; border-left: 4px solid var(--warning-color); }
+        .alert-error { background-color: #FEF2F2; color: #991B1B; border-left: 4px solid var(--error-color); }
+
+        /* Buttons */
+        .btn {
+            font-family: 'Poppins', sans-serif;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+            text-align: center;
+        }
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-secondary { background-color: white; color: var(--text-main); border-color: var(--border-color); }
+        .btn-secondary:hover { background-color: #F1F5F9; }
+        .btn-danger { background-color: transparent; color: var(--error-color); border-color: var(--error-color); }
+        .btn-danger:hover { background-color: #FEF2F2; }
+
+        hr { border: 0; border-top: 1px solid var(--border-color); margin: 25px 0; }
+
+        /* ==========================================
+           2. AUTHENTICATION / LOGIN PAGE
+           ========================================== */
+        #auth-container {
+            max-width: 550px;
+            margin: 80px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .auth-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .caption-center {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* ==========================================
+           3. MAIN APP LAYOUT (SIDEBAR + CONTENT)
+           ========================================== */
+        #app-container {
+            display: none; /* Controlled via JS */
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styling */
+        aside {
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .sidebar-brand img { width: 50px; height: auto; }
+        .sidebar-brand h2 { font-size: 1.25rem; font-weight: 800; color: var(--primary-color); }
+
+        .user-session {
+            background-color: #F8FAFC;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.85rem;
+            margin-bottom: 30px;
+            border-left: 3px solid var(--info-color);
+            word-break: break-all;
+        }
+
+        .nav-menu {
+            list-style: none;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-item:hover {
+            background-color: #F1F5F9;
+            color: var(--primary-color);
+        }
+
+        .nav-item.active {
+            background-color: #EFF6FF;
+            color: var(--primary-color);
+        }
+
+        /* Main Content Container */
+        main {
+            padding: 40px;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .view-section {
+            display: none; /* Controlled via JS */
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        /* ==========================================
+           4. COMPONENTS & GRID SYSTEMS
+           ========================================== */
+        /* Two Column Content Layout */
+        .row-flex {
+            display: flex;
+            gap: 30px;
+            margin-top: 25px;
+            align-items: flex-start;
+        }
+        .col-logo { flex: 1; }
+        .col-text { flex: 3; line-height: 1.7; }
+        .col-logo img { width: 100%; border-radius: 12px; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 25px 0; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 25px 0; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 30px 0; }
+
+        /* Metric Box Grid Dashboard */
+        .metric-box {
+            background-color: #F0F4F8;
+            padding: 22px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+        .metric-num { font-size: 2.2rem; font-weight: 800; color: var(--primary-hover); margin-bottom: 2px; }
+        .metric-label { font-size: 0.85rem; color: var(--text-card); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Tabs System */
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 25px;
+            gap: 10px;
+        }
+        .tab-link {
+            padding: 12px 24px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .tab-link:hover { color: var(--primary-color); }
+        .tab-link.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--accent-color);
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Culture Cards (Presisi & Simetris) */
+        .culture-card {
+            background-color: white;
+            padding: 25px;
+            border-radius: 16px;
+            border-bottom: 5px solid var(--accent-color);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            height: 440px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .card-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            background-color: #F1F5F9;
+        }
+        .card-title { color: var(--primary-color); font-weight: 700; margin-bottom: 8px; font-size: 1.25rem; }
+        .card-text { font-size: 0.95rem; color: var(--text-card); line-height: 1.6; flex-grow: 1; }
+        .card-action-btn { margin-top: auto; }
+
+        /* Quiz Form Styling */
+        .quiz-group {
+            margin-bottom: 25px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+        .quiz-question { font-weight: 600; margin-bottom: 12px; color: var(--text-main); }
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+        .radio-option input { cursor: pointer; transform: scale(1.1); }
+
+        /* Premium Footer Area */
+        .quote-text {
+            font-size: 1.25rem;
+            font-style: italic;
+            text-align: center;
+            color: #1E40AF;
+            font-weight: 600;
+            margin-top: 40px;
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        .footer-columns h4 { font-size: 1rem; color: var(--text-main); margin-bottom: 6px; }
+        .footer-columns p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 992px) {
+            #app-container { grid-template-columns: 1fr; }
+            aside { height: auto; position: relative; }
+            .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; }
+            .row-flex { flex-direction: column; }
+        }
+        @media (max-width: 600px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .culture-card { height: auto; }
+            .auth-buttons { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="auth-view">
+        <div id="auth-container">
+            <div class="main-title">Selamat Datang di Nusantara</div>
+            <div class="subtitle">Masukkan email Anda untuk memulai perjalanan budaya Indonesia</div>
+            
+            <div id="auth-error-placeholder"></div>
+
+            <form id="login-form" onsubmit="handleAuth(event)">
+                <div class="form-group">
+                    <label for="email-input">REKREASI DIGITAL MUSEUM (EMAIL)</label>
+                    <input type="email" id="email-input" class="form-control" placeholder="nama@email.com" required>
+                </div>
+                
+                <div class="auth-buttons">
+                    <button type="submit" class="btn btn-primary" onclick="setAuthAction('masuk')">Masuk</button>
+                    <button type="submit" class="btn btn-secondary" onclick="setAuthAction('daftar')">Daftar</button>
+                </div>
+            </form>
+            
+            <hr>
+            <div class="caption-center">
+                Setelah masuk, Anda akan menjelajahi kekayaan budaya Nusantara, dari seni tradisional hingga kisah-kisah epik.<br><b>(Web Dashboard Edition)</b>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="app-container">
+        <aside>
+            <div class="sidebar-brand">
+                <img src="https://img.icons8.com/color/96/indonesia-map.png" alt="Map Logo">
+                <h2>Navigasi Museum</h2>
+            </div>
+            
+            <div class="user-session">
+                👤 Sesi Aktif:<br><span id="session-email-display" style="font-weight: 600;"></span>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item active" onclick="switchMenu('beranda', this)">Beranda & Filosofi</li>
+                <li class="nav-item" onclick="switchMenu('eksplorasi', this)">Eksplorasi Suku Bangsa</li>
+                <li class="nav-item" onclick="switchMenu('kuis', this)">Galeri & Kuis Interaktif</li>
+            </ul>
+            
+            <hr>
+            <button class="btn btn-danger" onclick="handleLogout()">Keluar (Logout)</button>
+        </aside>
+
+        <main>
+            
+            <section id="view-beranda" class="view-section active">
+                <div class="main-title">Nusantara: Warisan Budaya</div>
+                <div class="alert alert-info">
+                    Sebuah perjalanan digital premium melintasi kekayaan budaya Nusantara dari Jawa hingga Papua, dari masa lampau yang agung hingga identitas yang hidup hari ini.
+                </div>
+
+                <h3 style="margin-top:30px;">🏛️ Filosofi Bangsa</h3>
+                <div class="row-flex">
+                    <div class="col-logo">
+                        <img src="BHINEKA.png" alt="Bhinneka Tunggal Ika" onerror="this.src='https://via.placeholder.com/250x250?text=BHINEKA.png'">
+                        <p style="text-align:center; font-size:0.85rem; color:var(--text-muted); margin-top:5px;">Bhinneka Tunggal Ika</p>
+                    </div>
+                    <div class="col-text">
+                        <p><strong>Bhinneka Tunggal Ika</strong> merupakan semboyan bangsa Indonesia yang memiliki arti <strong>"Berbeda-beda tetapi tetap satu jua."</strong> Semboyan ini menjadi lambang persatuan masyarakat Indonesia yang memiliki beragam suku, agama, budaya, bahasa, adat istiadat, dan tradisi.</p>
+                        <br>
+                        <p>Kalimat Bhineka Tunggal Ika berasal dari <strong>kitab Sutasoma karya Mpu Tantular</strong> pada masa Kerajaan Majapahit. Makna dari semboyan ini adalah bahwa perbedaan bukanlah penghalang untuk hidup rukun, saling menghormati, dan bekerja sama demi mencapai tujuan bersama sebagai bangsa Indonesia.</p>
+                    </div>
+                </div>
+
+                <hr>
+                <h3>💡 Penerapan Bhinneka Tunggal Ika</h3>
+                <p style="color:var(--text-muted); margin-bottom:15px;">Dalam kehidupan sehari-hari, penerapan semboyan ini dapat diwujudkan dengan:</p>
+                
+                <div class="grid-2">
+                    <div class="alert alert-success" style="margin-bottom:0;">
+                        <h4 style="margin-bottom:5px;">Toleransi & Hormat</h4>
+                        <ul>
+                            <li>Menghargai perbedaan pendapat dan keyakinan di lingkungan masyarakat.</li>
+                            <li>Menjaga toleransi antar umat beragama demi kenyamanan bersama.</li>
+                        </ul>
+                    </div>
+                    <div class="alert alert-success" style="margin-bottom:0;">
+                        <h4 style="margin-bottom:5px;">Persatuan & Sosial</h4>
+                        <ul>
+                            <li>Tidak membeda-bedakan latar belakang suku, agama, maupun budayanya.</li>
+                            <li>Mengutamakan persatuan, kesatuan, serta semangat gotong royong.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning">
+                    Sebagai negara yang kaya akan keberagaman, Indonesia menjadikan Bhinneka Tunggal Ika sebagai pedoman untuk memperkuat rasa persaudaraan dan menjaga keutuhan bangsa.
+                </div>
+
+                <div class="grid-4">
+                    <div class="metric-box"><div class="metric-num">1.300+</div><div class="metric-label">Suku Bangsa</div></div>
+                    <div class="metric-box"><div class="metric-num">700+</div><div class="metric-label">Bahasa Daerah</div></div>
+                    <div class="metric-box"><div class="metric-num">38</div><div class="metric-label">Provinsi</div></div>
+                    <div class="metric-box"><div class="metric-num">1</div><div class="metric-label">Negara Kesatuan</div></div>
+                </div>
+            </section>
+
+            <section id="view-eksplorasi" class="view-section">
+                <div class="main-title">Eksplorasi Suku Nusantara</div>
+                <div class="subtitle">Menelusuri keunikan dan identitas kesenian tiap wilayah</div>
+
+                <div class="tabs-header">
+                    <div class="tab-link active" onclick="switchTab('tab-jawa', this)">Suku Jawa</div>
+                    <div class="tab-link" onclick="switchTab('tab-batak', this)">Suku Batak</div>
+                    <div class="tab-link" onclick="switchTab('tab-dayak', this)">Suku Dayak</div>
+                    <div class="tab-link" onclick="switchTab('tab-asmat', this)">Suku Asmat</div>
+                </div>
+
+                <div id="tab-jawa" class="tab-content active">
+                    <h2 style="color:var(--primary-color); margin-bottom:10px;">Keagungan Budaya Jawa</h2>
+                    <p style="color:var(--text-muted); margin-bottom:20px;">Budaya Jawa dikenal dengan filosofi halus, kesenian wayang kulit, gamelan yang memukau, serta batik dengan motif bermakna mendalam.</p>
+                    
+                    <div class="grid-3">
+                        <div class="culture-card">
+                            <div>
+                                <img src="batik.jpeg" class="card-img" onerror="this.src='https://via.placeholder.com/300x180?text=batik.jpeg'">
+                                <h3 class="card-title">🎨 Batik Keraton</h3>
+                                <p class="card-text">Motif Parang dan Kawung yang mencerminkan simbol keagungan, keindahan, dan kesucian.</p>
+                            </div>
+                        </div>
+                        <div class="culture-card">
+                            <div>
+                                <img src="wayang.jpeg" class="card-img" onerror="this.src='https://via.placeholder.com/300x180?text=wayang.jpeg'">
+                                <h3 class="card-title">🎭 Wayang Kulit</h3>
+                                <p class="card-text">Seni pertunjukan bayangan legendaris yang sarat akan pesan moral dan kisah epik kehidupan.</p>
+                            </div>
+                        </div>
+                        <div class="culture-card">
+                            <div>
+                                <img src="gamelan.jpeg" class="card-img" onerror="this.src='https://via.placeholder.com/300x180?text=gamelan.jpeg'">
+                                <h3 class="card-title">🎵 Gamelan</h3>
+                                <p class="card-text">Orkestra musik tradisional instrumen perkusi yang menjadi jiwa dalam harmoni perayaan Jawa.</p>
+                            </div>
+                            <button class="btn btn-secondary card-action-btn" onclick="playAudio('suara2.mp3')">▶ Dengarkan Gamelan</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-batak" class="tab-content">
+                    <h2 style="color:var(--primary-color); margin-bottom:10px;">Kekuatan & Identitas Batak</h2>
+                    <p style="color:var(--text-muted); margin-bottom:20px;">Suku Batak dari Sumatera Utara dikenal dengan keberanian, kecerdasan, dan ikatan kekerabatan adat yang sangat kokoh.</p>
+                    
+                    <div class="grid-3">
+                        <div class="culture-card">
+                            <div>
+                                <img src="ulos.jpeg" class="card-img" onerror="this.src='https://via.placeholder.com/300x180?text=ulos.jpeg'">
+                                <h3 class="card-title">🧣 Kain Ulos</h3>
+                                <p class="card-text">Kain tenun sakral masyarakat Batak yang menjadi simbol restu, kehangatan, perlindungan, dan status adat.</p>
+                            </div>
+                        </div>
+                        <div class="culture-card">
+                            <div>
+                                <img src="bolon.jpeg" class="card-img" onerror="this.src='https://via.placeholder.com/300x180?text=bolon.jpeg'">
+                                <h3 class="card-title">🏠 Rumah Bolon</h3>
+                                <p class="card-text">Arsitektur rumah adat tradisional Batak yang megah menyerupai bentuk perahu, sarat filosofi garis hidup.</p>
+                            </div>
+                        </div>
+                        <div class="culture-card">
+                            <div>
+                                <img src="gondang.jpeg" class="card-img" onerror="this.src='https://via.placeholder.com/300x180?text=gondang.jpeg'">
+                                <h3 class="card-title">Drum Gondang</h3>
+                                <p class="card-text">Ensembel musik ritual perkusi Batak sebagai sarana penghubung komunikasi spiritual spiritual leluhur.</p>
+                            </div>
+                            <button class="btn btn-secondary card-action-btn" onclick="playAudio('suara3.mp3')">▶ Dengarkan Gondang</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-dayak" class="tab-content">
+                    <h2 style="color:var(--primary-color); margin-bottom:10px;">Penjaga Hutan Kalimantan</h2>
+                    <p style="color:var(--text-muted); margin-bottom:20px;">Suku Dayak hidup selaras harmoni bersama alam rimba melalui arsitektur komunal, seni ukir eksotis, dan hukum adat pelestarian.</p>
+                    
+                    <div class="grid-3">
+                        <div class="culture-card">
+                            <div>
+                                <img src="betang.jpeg" class="card-img" onerror="this.src='https://via.placeholder.com/300x180?text=betang.jpeg'">
+                                <h3 class="card-title">🏠 Rumah Betang</h3>
+                                <p class="card-text">Pusat interaksi sosial kehidupan komunal Dayak yang menampung ratusan keluarga dalam satu atap silaturahmi.</p>
+                            </div>
+                            <button class="btn btn-secondary card-action-btn" onclick="alert('Info Rumah Betang: Rumah panggung panjang khas Dayak.')">Info Rumah Betang</button>
+                        </div>
+                        <div class="culture-card">
+                            <div>
+                                <img src="ukir_dayak.jpeg" class="card-img" onerror="this.src='https://via.placeholder.com/300x180?text=ukir_dayak.jpeg'">
+                                <h3 class="card-title">🪵 Seni Ukir</h3>
+                                <p class="card-text">Motif lengkungan geometris flora-fauna khas tameng dan dinding perisai, melambangkan kosmologi spiritualitas alam.</p>
+                            </div>
+                            <button class="btn btn-secondary card-action-btn" onclick="alert('Info Seni Ukir: Ukiran eksotis bernilai magis tinggi.')">Info Seni Ukir</button>
+                        </div>
+                        <div class="culture-card">
+                            <div>
+                                <img src="hutan_dayak.jpeg" class="card-img" onerror="this.src='https://via.placeholder.com/300x180?text=hutan_dayak.jpeg'">
+                                <h3 class="card-title">🌿 Kearifan Alam</h3>
+                                <p class="card-text">Tradisi kelola hutan adat secara bijak yang telah diwariskan turun-temurun selama ribuan tahun lamanya.</p>
+                            </div>
+                            <button class="btn btn-secondary card-action-btn" onclick="alert('Info Adat Hutan: Manajemen alam lestari berbasis hukum adat.')">Info Adat Hutan</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-asmat" class="tab-content">
+                    <h2 style="color:var(--primary-color); margin-bottom:10px;">Seni & Jiwa Asmat</h2>
+                    <p style="color:var(--text-muted); margin-bottom:20px;">UNESCO mengakui karya seni ukiran patung kayu Suku Asmat Papua sebagai salah satu warisan mahakarya dunia yang mengagumkan.</p>
+                    
+                    <div class="grid-3">
+                        <div class="culture-card">
+                            <div>
+                                <img src="patung_asmat.jpeg" class="card-img" onerror="this.src='https://via.placeholder.com/300x180?text=patung_asmat.jpeg'">
+                                <h3 class="card-title">🗿 Ukiran Kayu</h3>
+                                <p class="card-text">Mahakarya seni pahat tanpa sketsa kasar, perwujudan fisik tertinggi penghormatan kepada arwah leluhur.</p>
+                            </div>
+                        </div>
+                        <div class="culture-card">
+                            <div>
+                                <img src="perahu_asmat.jpeg" class="card-img" onerror="this.src='https://via.placeholder.com/300x180?text=perahu_asmat.jpeg'">
+                                <h3 class="card-title">🛶 Perahu Lesung</h3>
+                                <p class="card-text">Simbol kendaraan sakral penyeberangan transisi spiritual menuju dimensi alam baka leluhur.</p>
+                            </div>
+                        </div>
+                        <div class="culture-card">
+                            <div>
+                                <img src="ritual_asmat.jpeg" class="card-img" onerror="this.src='https://via.placeholder.com/300x180?text=ritual_asmat.jpeg'">
+                                <h3 class="card-title">🔥 Ritual Adat</h3>
+                                <p class="card-text">Upacara tari penyambutan sakral penghubung keharmonisan generasi suku yang hidup dengan pendahulu.</p>
+                            </div>
+                            <button class="btn btn-secondary card-action-btn" onclick="playAudio('suara1.mp3')">▶ Musik Ritual</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-kuis" class="view-section">
+                <div class="main-title">Galeri Digital & Evaluasi</div>
+                
+                <h3 style="margin: 25px 0 15px 0;">📸 Galeri Digital: Dokumentasi Adat</h3>
+                <div class="grid-3">
+                    <div>
+                        <img src="kebersamaan_nusantara.jpg" alt="Pesona Kebersamaan Nusantara" style="width:100%; border-radius:8px;" onerror="this.src='https://via.placeholder.com/350x220?text=kebersamaan_nusantara.jpg'">
+                        <p style="font-size:0.85rem; color:var(--text-muted); margin-top:5px; text-align:center;">Pesona Kebersamaan Nusantara</p>
+                    </div>
+                    <div>
+                        <img src="pentas_seni.jpeg" alt="Keberagaman Pentas Seni" style="width:100%; border-radius:8px;" onerror="this.src='https://via.placeholder.com/350x220?text=pentas_seni.jpeg'">
+                        <p style="font-size:0.85rem; color:var(--text-muted); margin-top:5px; text-align:center;">Keberagaman Pentas Seni</p>
+                    </div>
+                    <div>
+                        <img src="seni_kolosal.jpg" alt="Karya Budaya Kolosal" style="width:100%; border-radius:8px;" onerror="this.src='https://via.placeholder.com/350x220?text=seni_kolosal.jpg'">
+                        <p style="font-size:0.85rem; color:var(--text-muted); margin-top:5px; text-align:center;">Karya Budaya Kolosal</p>
+                    </div>
+                </div>
+
+                <hr>
+                <h3 style="margin-bottom:15px;">📝 Kuis Pengetahuan Budaya</h3>
+                
+                <div id="quiz-result-placeholder"></div>
+
+                <form id="cultural-quiz" onsubmit="evaluateQuiz(event)">
+                    <div class="quiz-group">
+                        <div class="quiz-question">1. Dari kitab sastra manakah semboyan Bhinneka Tunggal Ika berasal?</div>
+                        <label class="radio-option"><input type="radio" name="q1" value="A"> A. Kakawin Ramayana</label>
+                        <label class="radio-option"><input type="radio" name="q1" value="B"> B. Kakawin Sutasoma</label>
+                        <label class="radio-option"><input type="radio" name="q1" value="C"> C. Negarakertagama</label>
+                        <label class="radio-option"><input type="radio" name="q1" value="D"> D. Pararaton</label>
+                    </div>
+
+                    <div class="quiz-group">
+                        <div class="quiz-question">2. Kain tenun sakral yang menjadi simbol restu dalam budaya Batak disebut?</div>
+                        <label class="radio-option"><input type="radio" name="q2" value="A"> A. Batik</label>
+                        <label class="radio-option"><input type="radio" name="q2" value="B"> B. Songket</label>
+                        <label class="radio-option"><input type="radio" name="q2" value="C"> C. Ulos</label>
+                        <label class="radio-option"><input type="radio" name="q2" value="D"> D. Ikat</label>
+                    </div>
+
+                    <div class="quiz-group">
+                        <div class="quiz-question">3. Suku Asmat berasal dari pulau mana di Indonesia?</div>
+                        <label class="radio-option"><input type="radio" name="q3" value="A"> A. Kalimantan</label>
+                        <label class="radio-option"><input type="radio" name="q3" value="B"> B. Sumatera</label>
+                        <label class="radio-option"><input type="radio" name="q3" value="C"> C. Jawa</label>
+                        <label class="radio-option"><input type="radio" name="q3" value="D"> D. Papua</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: auto; padding:12px 30px;">Submit Jawaban</button>
+                </form>
+            </section>
+
+            <br><br>
+            <div class="quote-text">"Bangsa yang menghargai budayanya adalah bangsa yang memahami jati dirinya."</div>
+            
+            <div class="grid-3 footer-columns" style="margin-top:20px; text-align: left;">
+                <div>
+                    <h4>🌐 Eksplorasi Lebih Dalam</h4>
+                    <p>Kunjungi museum fisik terdekat dan dukung pelestarian situs budaya daerah.</p>
+                </div>
+                <div>
+                    <h4>📢 Bagikan Pengetahuan</h4>
+                    <p>Sebarkan esensi positif keberagaman Nusantara kepada lingkungan sekitar Anda.</p>
+                </div>
+                <div>
+                    <h4>🛡️ Lestarikan Warisan</h4>
+                    <p>Dukung eksistensi UMKM pengrajin lokal tenun, batik, dan pegiat seni tradisional.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="audio-channels"></div>
+
+    <script>
+        // Global Application State Objects
+        const state = {
+            loggedIn: false,
+            userEmail: "",
+            currentAuthAction: "masuk"
+        };
+
+        // Setter dynamic action helper
+        function setAuthAction(action) {
+            state.currentAuthAction = action;
+        }
+
+        /* --- CONTROLLER: AUTHENTICATION FLOW --- */
+        function handleAuth(event) {
+            event.preventDefault();
+            const emailInput = document.getElementById('email-input').value.trim();
+            const errorPlaceholder = document.getElementById('auth-error-placeholder');
+            
+            errorPlaceholder.innerHTML = ""; // Reset error state
+
+            if (emailInput === "") {
+                errorPlaceholder.innerHTML = `<div class="alert alert-error">Gagal Masuk: Kolom email tidak boleh kosong!</div>`;
+                return;
+            }
+
+            // Success Gate Simulation
+            state.loggedIn = true;
+            state.userEmail = emailInput;
+
+            // DOM UI Switch
+            document.getElementById('auth-view').style.display = 'none';
+            document.getElementById('app-container').style.display = 'grid';
+            document.getElementById('session-email-display').innerText = state.userEmail;
+            
+            // Auto reset kuis dan scroll up
+            document.getElementById('cultural-quiz').reset();
+            document.getElementById('quiz-result-placeholder').innerHTML = "";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function handleLogout() {
+            state.loggedIn = false;
+            state.userEmail = "";
+            
+            // Clean view states
+            document.getElementById('email-input').value = "";
+            document.getElementById('app-container').style.display = 'none';
+            document.getElementById('auth-view').style.display = 'block';
+            stopAllAudio();
+        }
+
+        /* --- CONTROLLER: SIDEBAR APP NAV ROUTER --- */
+        function switchMenu(menuKey, element) {
+            // Remove active classes inside sidebar items
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+
+            // Toggle view panels
+            document.querySelectorAll('.view-section').forEach(section => section.classList.remove('active'));
+            
+            if (menuKey === 'beranda') {
+                document.getElementById('view-beranda').classList.add('active');
+            } else if (menuKey === 'eksplorasi') {
+                document.getElementById('view-eksplorasi').classList.add('active');
+            } else if (menuKey === 'kuis') {
+                document.getElementById('view-kuis').classList.add('active');
+            }
+            window.scrollTo({ top: 0, behavior: 'instant' });
+        }
+
+        /* --- CONTROLLER: TAB COMPONENT SYSTEM --- */
+        function switchTab(tabId, element) {
+            // Handle header toggle activation links
+            const parent = element.parentElement;
+            parent.querySelectorAll('.tab-link').forEach(link => link.classList.remove('active'));
+            element.classList.add('active');
+
+            // Handle switching cards contents panel sheets
+            const contentContainer = parent.parentElement;
+            contentContainer.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        /* --- CONTROLLER: SIMULASI AUDIO ENGINE --- */
+        /* --- CONTROLLER: AUDIO ENGINE (FIXED) --- */
+function playAudio(fileName) {
+    const audioChannels = document.getElementById('audio-channels');
+    
+    stopAllAudio(); // Mencegah audio bertumpukan
+
+    const audioObj = document.createElement('audio');
+    
+    // SEKARANG SUDAH MENGGUNAKAN PATH LOKAL YANG KAMU KIRIM
+    audioObj.src = fileName; 
+    audioObj.controls = false;
+    audioObj.style.display = 'none';
+    
+    audioChannels.appendChild(audioObj);
+    
+    audioObj.play()
+        .then(() => {
+            console.log(`Berhasil memutar: ${fileName}`);
+        })
+        .catch(err => {
+            console.error("Gagal memutar audio:", err);
+            alert(`Gagal memutar audio lokal. Pastikan file "${fileName}" ada di folder yang benar.`);
+        });
+}
+
+        function stopAllAudio() {
+            document.getElementById('audio-channels').innerHTML = "";
+        }
+
+        /* --- CONTROLLER: VALIDASI EVALUASI KUIS FORM --- */
+        function evaluateQuiz(event) {
+            event.preventDefault();
+            
+            const form = document.getElementById('cultural-quiz');
+            const data = new FormData(form);
+            
+            const q1 = data.get('q1');
+            const q2 = data.get('q2');
+            const q3 = data.get('q3');
+
+            const resultPlaceholder = document.getElementById('quiz-result-placeholder');
+            resultPlaceholder.innerHTML = ""; // Reset status view
+
+            // Form Validation checking
+            if (!q1 || !q2 || !q3) {
+                resultPlaceholder.innerHTML = `<div class="alert alert-warning">Mohon isi dan lengkapi seluruh pertanyaan kuis terlebih dahulu!</div>`;
+                resultPlaceholder.scrollIntoView({ behavior: 'smooth' });
+                return;
+            }
+
+            // Scoring system matching algorithms
+            let score = 0;
+            if (q1 === "B") score += 1;
+            if (q2 === "C") score += 1;
+            if (q3 === "D") score += 1;
+
+            const percentage = Math.round((score / 3) * 100);
+            let responseHtml = `<h3>Hasil Evaluasi Anda: <strong>${score}/3 Benar</strong> (${percentage}%)</h3>`;
+
+            if (score === 3) {
+                resultPlaceholder.innerHTML = `<div class="alert alert-success">${responseHtml}<p>Luar biasa! Pengetahuan kebudayaan Nusantara Anda sempurna! 🎉</p></div>`;
+            } else if (score > 0) {
+                resultPlaceholder.innerHTML = `<div class="alert alert-warning">${responseHtml}<p>Cukup baik! Sila baca kembali materi pameran suku untuk meraih skor sempurna.</p></div>`;
+            } else {
+                resultPlaceholder.innerHTML = `<div class="alert alert-error">${responseHtml}<p>Skor Anda masih 0%. Sila pelajari kembali materi seni adat di Tab Suku.</p></div>`;
+            }
+
+            resultPlaceholder.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
